@@ -4,11 +4,13 @@
  * and open the template in the editor.
  */
 
-
 function isEmpty(obj) {
 
     // null and undefined are "empty"
     if (obj === null)
+        return true;
+    
+    if(typeof obj === 'undefined')
         return true;
 
     // Assume if it has a length property with a non-zero value
