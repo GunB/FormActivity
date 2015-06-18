@@ -7,6 +7,10 @@ debugging = false;
         var settings = $.extend({
             config: {
                 required: true,
+                default_container: {
+                    "type": "div",
+                    "class" : "wf-container"
+                },
                 types: {
                     "text": {
                         "add_type": true,
@@ -65,6 +69,8 @@ debugging = false;
             //debugging ? console.log("form element: ", name, val) : false;
             debugging ? console.log("Creating ", val) : false;
 
+            val.fixed_name ? name = val.fixed_name : false;
+
             var typeTag;
 
             var boolIsTypeSpecial = !isEmpty(settings.types[val.type]);
@@ -92,12 +98,10 @@ debugging = false;
             val.text ? element.text(val.text) : false;
             val.html ? element.html(val.html) : false;
 
-            if (val.required) {
-                if (boolIsTypeSpecial) {
-                    if (objType.requirable) {
-                        val.required ? element.prop("required", true) : settings.required ? element.prop("required", true) : false;
-                        val.required ? element.attr("required", true) : settings.required ? element.attr("required", true) : false;
-                    }
+            if (boolIsTypeSpecial) {
+                if (objType.requirable) {
+                    val.required ? element.prop("required", true) : settings.required ? element.prop("required", true) : false;
+                    val.required ? element.attr("required", true) : settings.required ? element.attr("required", true) : false;
                 }
             }
 
@@ -149,12 +153,31 @@ debugging = false;
                 }
             }
 
+            if (!isEmpty(val.label)) {
+                var temp_element;
+                if (!isEmpty(settings.default_container)) {
+                    temp_element = create_element(null, settings.default_container, settings);
+                    temp_element.append(element);
+                    element = temp_element;
+                }
+                if ($.isPlainObject(val.label)) {
+                    temp_element = create_element(null, val.label, settings);
+                } else {
+                    temp_element =
+                            create_element(null, {
+                                type: "label", html: val.label, "attr": {"for": name}
+                            }, config);
+                }
+                element.append(temp_element);
+            }
+
             return element;
         };
         //</editor-fold>
 
         return this.each(function () {
             var that = $(this);
+            that.addClass("webformed");
             // Do something to each element here.
             var target = settings.data;
             for (var k in target) {
@@ -172,35 +195,22 @@ debugging = false;
                     thatForm = element;
                 }
 
-                if (!isEmpty(target[k].label)) {
-                    element = create_element(null, {type: "label", html: target[k].label, "attr": {"for": k}}, config);
-                    thatForm.append(element);
-                }
-
                 //<editor-fold defaultstate="collapsed" desc="adding elements with same properties">
-                if (!isEmpty(target[k].elements_l)) {
-                    var target_2 = target[k].elements_l;
-                    for (var k2 in target_2) {
-                        if (target_2.hasOwnProperty(k2)) {
-                            target[k].value = k2;
-                            element = create_element(null, {type: "label", html: target_2[k2], "attr": {"for": k}}, config);
-                            thatForm.append(element);
-                            element = create_element(k, target[k], config);
-                            thatForm.append(element);
-                        }
-                    }
-                } else if (!isEmpty(target[k].elements_r)) {
-                    var target_2 = target[k].elements_r;
-                    for (var k2 in target_2) {
-                        if (target_2.hasOwnProperty(k2)) {
-                            target[k].value = k2;
-                            element = create_element(k, target[k], config);
-                            thatForm.append(element);
-                            element = create_element(null, {type: "label", html: target_2[k2], "attr": {"for": k}}, config);
-                            thatForm.append(element);
-                        }
-                    }
+                if (!isEmpty(target[k].elements)) {
+                    var target_2 = target[k].elements;
+                    delete target[k].elements;
 
+                    for (var k2 in target_2) {
+                        if (target_2.hasOwnProperty(k2)) {
+                            var objTemp = target[k];
+                            objTemp.label = {
+                                "type" : "label",
+                                "html" : target_2[k2]
+                            };
+                            element = create_element(k, objTemp, config);
+                            thatForm.append(element);
+                        }
+                    }
                 }
                 //</editor-fold>
                 else {

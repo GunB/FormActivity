@@ -12,7 +12,7 @@
                 "type": "div",
                 "class": "horizontal"
             },
-            "elements_r": {
+            "elements": {
                 "1": "Primer",
                 "2": "Segundo"
             }
@@ -23,7 +23,7 @@
                 "class": "vertical"
             },
             "type": "checkbox",
-            "elements_l": {
+            "elements": {
                 "1": "Primer",
                 "2": "Segundo"
             }
