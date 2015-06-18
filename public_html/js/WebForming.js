@@ -8,7 +8,7 @@ debugging = false;
             config: {
                 required: true,
                 add_type: [
-                    "text", "submit", "email", "range", "radio", "password"
+                    "text", "submit", "email", "range", "radio", "password", "checkbox"
                 ]
             },
             style: {
@@ -37,6 +37,7 @@ debugging = false;
                     case "submit":
                     case "range":
                     case "radio":
+                    case "checkbox":
                     case "password":
                         typeTag = '<input/>';
                         break;

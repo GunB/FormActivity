@@ -19,6 +19,17 @@
                 "1" : "Primer",
                 "2" : "Segundo"
             }
+        },
+        "Looking" : {
+            "container" : {
+                "type" : "span",
+                "class" : "vertical"
+            },
+            "type" : "checkbox",
+            "elements_l" : {
+                "1" : "Primer",
+                "2" : "Segundo"
+            }
         }
     }
 }
