@@ -1,34 +1,48 @@
 {
     "default": {
-        
     },
     "data": {
         "name": {
-            "container" : "div",
+            "container": "div",
             "type": "text",
             "value": "ASD",
-            "label" : "Nueva pregunta abierta"
+            "label": "Nueva pregunta abierta"
         },
-        "checking" : {
-            "type"  : "radio",
-            "container" : {
-                "type" : "div",
-                "class" : "horizontal"
+        "checking": {
+            "type": "radio",
+            "container": {
+                "type": "div",
+                "class": "horizontal"
             },
-            "elements_r" : {
-                "1" : "Primer",
-                "2" : "Segundo"
+            "elements_r": {
+                "1": "Primer",
+                "2": "Segundo"
             }
         },
-        "Looking" : {
-            "container" : {
-                "type" : "span",
-                "class" : "vertical"
+        "Looking": {
+            "container": {
+                "type": "span",
+                "class": "vertical"
             },
-            "type" : "checkbox",
-            "elements_l" : {
-                "1" : "Primer",
-                "2" : "Segundo"
+            "type": "checkbox",
+            "elements_l": {
+                "1": "Primer",
+                "2": "Segundo"
+            }
+        },
+        "Type_of_music": {
+            "type": "select",
+            "data": {
+                "1": {
+                    "type": "option",
+                    "value": "1",
+                    "html": "Nuevo"
+                },
+                "2": {
+                    "type": "option",
+                    "value": "2",
+                    "html": "ASD"
+                }
             }
         }
     }

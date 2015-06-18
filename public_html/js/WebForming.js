@@ -1,4 +1,4 @@
-debugging = false;
+debugging = true;
 (function ($) {
 
     $.fn.WebForming = function (options) {
@@ -7,9 +7,48 @@ debugging = false;
         var settings = $.extend({
             config: {
                 required: true,
-                add_type: [
-                    "text", "submit", "email", "range", "radio", "password", "checkbox"
-                ]
+                types: {
+                    "text": {
+                        "add_type": true,
+                        "add_name": true,
+                        "special_tag": "input",
+                        "requirable": true
+                    }, "submit": {
+                        "add_type": true,
+                        "add_name": true,
+                        "special_tag": "input",
+                        "requirable": true
+                    }, "email": {
+                        "add_type": true,
+                        "add_name": true,
+                        "special_tag": "input",
+                        "requirable": true
+                    }, "range": {
+                        "add_type": true,
+                        "add_name": true,
+                        "special_tag": "input",
+                        "requirable": true
+                    }, "radio": {
+                        "add_type": true,
+                        "add_name": true,
+                        "special_tag": "input",
+                        "requirable": true
+                    }, "password": {
+                        "add_type": true,
+                        "add_name": true,
+                        "special_tag": "input",
+                        "requirable": true
+                    }, "checkbox": {
+                        "add_type": true,
+                        "add_name": true,
+                        "special_tag": "input",
+                        "requirable": true
+                    }, "select": {
+                        "add_type": false,
+                        "add_name": true,
+                        "requirable": true
+                    }
+                }
             },
             style: {
                 //background: "transparent"
@@ -24,96 +63,80 @@ debugging = false;
         //<editor-fold defaultstate="collapsed" desc="Create element">
         var create_element = function (name, val, settings) {
             //debugging ? console.log("form element: ", name, val) : false;
-            debugging ? console.log("Settings ", settings, val) : false;
+            debugging ? console.log("Creating ", val) : false;
 
             var typeTag;
 
+            var boolIsTypeSpecial = !isEmpty(settings.types[val.type]);
+            var objType = boolIsTypeSpecial ? settings.types[val.type] : null;
+
+            //<editor-fold defaultstate="collapsed" desc="Selecting type of element">
             if (isEmpty(val.type)) {
                 //return null;
             } else {
-                switch (val.type) {
-                    case "text":
-                    case "email":
-                    case "submit":
-                    case "range":
-                    case "radio":
-                    case "checkbox":
-                    case "password":
-                        typeTag = '<input/>';
-                        break;
-                        /*case "button":
-                         typeTag = '<button/>';
-                         break;
-                         case "textarea":
-                         typeTag = '<textarea/>';
-                         break;
-                         case "select":
-                         typeTag = '<select/>';
-                         break;
-                         case "option":
-                         typeTag = '<option/>';
-                         break;*/
-                    default:
-                        typeTag = '<' + val.type + '/>';
-                }
+                typeTag =
+                        boolIsTypeSpecial ?
+                        settings.types[val.type].special_tag ?
+                        "<" + settings.types[val.type].special_tag + "/>" : "<" + val.type + "/>"
+                        : "<" + val.type + "/>";
             }
+            //</editor-fold>
 
             var element;
 
-            if (isEmpty(val.data)) {
-                element = $(typeTag, {name: name});
-                debugging ? console.log("Obj element: ", val, element) : false;
+            element = $(typeTag);
+            debugging ? console.log("Obj element: ", val, element) : false;
 
-                //<editor-fold defaultstate="collapsed" desc="set element values">
-                val.value ? element.val(val.value) : false;
-                val.text ? element.text(val.text) : false;
-                val.html ? element.html(val.html) : false;
+            //<editor-fold defaultstate="collapsed" desc="set element values">
+            val.value ? element.val(val.value) : false;
+            val.text ? element.text(val.text) : false;
+            val.html ? element.html(val.html) : false;
 
-                if (val.required) {
-                    for (var i = 0; i < settings.add_type.length; i++) {
-                        if (settings.add_type[i] === val.type) {
-
-                            val.required ? element.prop("required", true) : settings.required ? element.prop("required", true) : false;
-                            val.required ? element.attr("required", true) : settings.required ? element.attr("required", true) : false;
-
-                            break;
-                        }
+            if (val.required) {
+                if (boolIsTypeSpecial) {
+                    if (objType.requirable) {
+                        val.required ? element.prop("required", true) : settings.required ? element.prop("required", true) : false;
+                        val.required ? element.attr("required", true) : settings.required ? element.attr("required", true) : false;
                     }
                 }
+            }
 
+            if (boolIsTypeSpecial) {
+                if (objType.add_type) {
+                    element.attr("type", val.type);
+                }
+                if (objType.add_name) {
+                    element.attr("name", name);
+                }
+            }
 
-                for (var i = 0; i < settings.add_type.length; i++) {
-                    if (settings.add_type[i] === val.type) {
-                        element.attr("type", val.type);
-                        break;
+            //</editor-fold>
+
+            //<editor-fold defaultstate="collapsed" desc="Extra data">
+            if (!isEmpty(val.class)) {
+                element.addClass(val.class);
+            }
+
+            if (!isEmpty(val.attr)) {
+                var target = val.attr;
+                for (var k in target) {
+                    if (target.hasOwnProperty(k)) {
+                        element.attr(k, target[k]);
                     }
                 }
-                //</editor-fold>
-
-                //<editor-fold defaultstate="collapsed" desc="Extra data">
-                if (!isEmpty(val.class)) {
-                    element.addClass(val.class);
-                }
-
-                if (!isEmpty(val.attr)) {
-                    var target = val.attr;
-                    for (var k in target) {
-                        if (target.hasOwnProperty(k)) {
-                            element.attr(k, target[k]);
-                        }
+            }
+            if (!isEmpty(val.prop)) {
+                var target = val.prop;
+                for (var k in target) {
+                    if (target.hasOwnProperty(k)) {
+                        element.attr(k, target[k]);
                     }
                 }
-                if (!isEmpty(val.prop)) {
-                    var target = val.prop;
-                    for (var k in target) {
-                        if (target.hasOwnProperty(k)) {
-                            element.attr(k, target[k]);
-                        }
-                    }
-                }
-                //</editor-fold>
+            }
+            //</editor-fold>
 
-                if (!isEmpty(val.data) && $.isPlainObject(val.data)) {
+            if (!isEmpty(val.data) && $.isPlainObject(val.data)) {
+                if ($.isPlainObject(val.data)) {
                     var target = val.data;
                     for (var k in target) {
                         if (target.hasOwnProperty(k)) {
@@ -121,11 +144,9 @@ debugging = false;
                             element.append(extra_element);
                         }
                     }
+                } else {
+                    element = element.html(val.data);
                 }
-
-
-            } else if (!$.isPlainObject(val.data)) {
-                element = $(typeTag, {html: val.data});
             }
 
             return element;
@@ -156,6 +177,7 @@ debugging = false;
                     thatForm.append(element);
                 }
 
+                //<editor-fold defaultstate="collapsed" desc="adding elements with same properties">
                 if (!isEmpty(target[k].elements_l)) {
                     var target_2 = target[k].elements_l;
                     for (var k2 in target_2) {
@@ -179,10 +201,13 @@ debugging = false;
                         }
                     }
 
-                } else {
+                }
+                //</editor-fold>
+                else {
                     element = create_element(k, target[k], config);
                     thatForm.append(element);
                 }
+
 
             }
         });
