@@ -1,6 +1,4 @@
 {
-    "default": {
-    },
     "data": {
         "name": {
             "container": "div",
@@ -31,8 +29,13 @@
             }
         },
         "Type_of_music": {
+            "container" : "div",
             "type": "select",
             "data": {
+                "0" : {
+                    "type": "option",
+                    "html": "Seleccione"
+                },
                 "1": {
                     "type": "option",
                     "value": "1",
