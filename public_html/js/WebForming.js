@@ -4,12 +4,15 @@ debugging = false;
     $.fn.WebForming = function (options) {
 
         // This is the easiest way to have default options.
-        var settings = $.extend({
+        var settings = $.extend({}, {
             config: {
                 required: true,
                 default_container: {
                     "type": "div",
-                    "class" : "wf-container"
+                    "class": "wf-container"
+                },
+                default_label: {
+                    "type": "label"
                 },
                 types: {
                     "text": {
@@ -46,6 +49,7 @@ debugging = false;
                         "add_type": true,
                         "add_name": true,
                         "special_tag": "input",
+                        "type_send": "array",
                         "requirable": true
                     }, "select": {
                         "add_type": false,
@@ -110,6 +114,7 @@ debugging = false;
                     element.attr("type", val.type);
                 }
                 if (objType.add_name) {
+                    objType.type_send === "array" ? name = name + "[]" : false;
                     element.attr("name", name);
                 }
             }
@@ -203,10 +208,12 @@ debugging = false;
                     for (var k2 in target_2) {
                         if (target_2.hasOwnProperty(k2)) {
                             var objTemp = target[k];
-                            objTemp.label = {
-                                "type" : "label",
-                                "html" : target_2[k2]
-                            };
+                            objTemp.value = k2;
+                            objTemp.label = $.extend(
+                                    {},
+                                    config.default_label,
+                                    {"html": target_2[k2]}
+                            );
                             element = create_element(k, objTemp, config);
                             thatForm.append(element);
                         }
@@ -217,8 +224,6 @@ debugging = false;
                     element = create_element(k, target[k], config);
                     thatForm.append(element);
                 }
-
-
             }
         });
     };

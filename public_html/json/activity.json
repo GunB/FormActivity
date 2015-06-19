@@ -29,7 +29,10 @@
             }
         },
         "Type_of_music": {
-            "container" : "div",
+            "container" : {
+                "type" : "div",
+                "class" : "button custom-select ff-hack"
+            },
             "type": "select",
             "data": {
                 "0" : {
