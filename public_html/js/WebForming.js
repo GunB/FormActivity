@@ -1,15 +1,17 @@
 debugging = false;
 (function ($) {
 
-    $.fn.WebForming = function (options) {
+    $.fn.WebForming = function (form_data, correct, options) {
 
         // This is the easiest way to have default options.
         var settings = $.extend({}, {
             config: {
                 required: true,
+                default_webformed: {
+                    "class": "webformed"
+                },
                 default_container: {
-                    "type": "div",
-                    "class": "wf-container"
+                    "type": "div"
                 },
                 default_label: {
                     "type": "label"
@@ -49,7 +51,7 @@ debugging = false;
                         "add_type": true,
                         "add_name": true,
                         "special_tag": "input",
-                        "type_send": "array",
+                        //"type_send": "array",
                         "requirable": true
                     }, "select": {
                         "add_type": false,
@@ -60,6 +62,25 @@ debugging = false;
             },
             style: {
                 //background: "transparent"
+            },
+            submit_callback: function (Object) {
+                var jObject = $(Object);
+
+                jObject.on("submit, click", "button, input[type='submit']", function (evt) {
+                    evt.preventDefault();
+                    var that = $(this).parents("."+config.default_webformed.class);
+                    var correct = that.prop("wf-cdata");
+                    
+                    var results = that.serializeArray();
+                    console.log(results);
+                    alert(results);
+                });
+            },
+            submit_correct: function (options) {
+
+            },
+            submit_incorrect: function (options) {
+
             }
         }, options);
 
@@ -67,6 +88,8 @@ debugging = false;
 
         var config = settings.config;
         debugging ? console.log("Data ", settings) : false;
+
+        var submit_callback = settings.submit_callback;
 
         //<editor-fold defaultstate="collapsed" desc="Create element">
         var create_element = function (name, val, settings) {
@@ -160,20 +183,27 @@ debugging = false;
 
             if (!isEmpty(val.label)) {
                 var temp_element;
+                var copy_element = element;
                 if (!isEmpty(settings.default_container)) {
                     temp_element = create_element(null, settings.default_container, settings);
-                    temp_element.append(element);
+
                     element = temp_element;
                 }
                 if ($.isPlainObject(val.label)) {
                     temp_element = create_element(null, val.label, settings);
                 } else {
+                    var temp_label = $.extend(
+                            {},
+                            config.default_label,
+                            {html: val.label,
+                                "attr": {"for": name}}
+                    );
+
                     temp_element =
-                            create_element(null, {
-                                type: "label", html: val.label, "attr": {"for": name}
-                            }, config);
+                            create_element(null, temp_label, config);
                 }
                 element.append(temp_element);
+                element.append(copy_element);
             }
 
             return element;
@@ -182,9 +212,11 @@ debugging = false;
 
         return this.each(function () {
             var that = $(this);
-            that.addClass("webformed");
+            that.prop("wf-cdata", correct);
+            that.addClass(config.default_webformed.class);
+            settings.submit_callback(this);
             // Do something to each element here.
-            var target = settings.data;
+            var target = form_data;
             for (var k in target) {
                 var element;
                 var thatForm = that;
@@ -212,7 +244,8 @@ debugging = false;
                             objTemp.label = $.extend(
                                     {},
                                     config.default_label,
-                                    {"html": target_2[k2]}
+                                    {"html": target_2[k2],
+                                        "attr": {"for": k}}
                             );
                             element = create_element(k, objTemp, config);
                             thatForm.append(element);
@@ -229,12 +262,19 @@ debugging = false;
     };
 
     $(document).ready(function () {
-        $("[WebForming]").each(function (k, v) {
+        $("[wf-form][wf-data][wf-noextra]").each(function () {
             var that = $(this);
-            $.getJSON(that.attr("WebForming"), function (data) {
-                that.WebForming(data);
+            var url_form = that.attr("wf-form");
+            var url_data = that.attr("wf-data");
+            var options = null;
+
+            $.when($.getJSON(url_form), $.getJSON(url_data)).done(function (form, data) {
+                that.WebForming(form[0], data[0], options);
             });
-            that.removeAttr("WebForming");
+
+            that.removeAttr("wf-form");
+            that.removeAttr("wf-data");
+            that.removeAttr("wf-noextra");
         });
     });
 

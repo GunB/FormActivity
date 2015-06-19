@@ -1,55 +1,54 @@
 {
-    "data": {
-        "name": {
-            "container": "div",
-            "type": "text",
-            "value": "ASD",
-            "label": "Nueva pregunta abierta"
+    "name": {
+        "type": "text",
+        "value": "ASD",
+        "label": "Nueva pregunta abierta"
+    },
+    "checking": {
+        "type": "radio",
+        "elements": {
+            "1": "Primer",
+            "2": "Segundo"
+        }
+    },
+    "Looking": {
+        "container": {
+            "type": "div",
+            "class": "horizontal"
         },
-        "checking": {
-            "type": "radio",
-            "container": {
-                "type": "div",
-                "class": "horizontal"
-            },
-            "elements": {
-                "1": "Primer",
-                "2": "Segundo"
-            }
+        "type": "checkbox",
+        "elements": {
+            "1": "Primer",
+            "2": "Segundo"
+        }
+    },
+    "Type_of_music": {
+        "container": {
+            "type": "div",
+            "class": "button custom-select ff-hack"
         },
-        "Looking": {
-            "container": {
-                "type": "span",
-                "class": "vertical"
+        "type": "select",
+        "data": {
+            "0": {
+                "type": "option",
+                "value": "",
+                "html": "Seleccione"
             },
-            "type": "checkbox",
-            "elements": {
-                "1": "Primer",
-                "2": "Segundo"
-            }
-        },
-        "Type_of_music": {
-            "container" : {
-                "type" : "div",
-                "class" : "button custom-select ff-hack"
+            "1": {
+                "type": "option",
+                "value": "1",
+                "html": "Nuevo"
             },
-            "type": "select",
-            "data": {
-                "0" : {
-                    "type": "option",
-                    "html": "Seleccione"
-                },
-                "1": {
-                    "type": "option",
-                    "value": "1",
-                    "html": "Nuevo"
-                },
-                "2": {
-                    "type": "option",
-                    "value": "2",
-                    "html": "ASD"
-                }
+            "2": {
+                "type": "option",
+                "value": "2",
+                "html": "ASD"
             }
         }
+    },
+    "send" :{
+        "type" : "button",
+        "html" : "Check your progress!",
+        "class" : "button"
     }
 }
