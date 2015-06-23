@@ -1,13 +1,25 @@
 {
     "name": {
-        "result": "",
-        "results": {
-            
-        },
-        "expression_result": "",
-        "expression_results": {
-            
-        },
-        "case_sensitive": true
+        "expression_results": [
+            "password",
+            "12345678",
+            "8675309",
+            "[a-z]{8,}",
+            "qwerty",
+            "asdfg",
+            "qazwsx",
+            "zxcvb",
+            "letmein",
+            "trustno1",
+            "omnicloud",
+            "monkey"
+        ]
+    },
+    "Looking": {
+        "expression_results": [
+            "1",
+            "2"
+        ],
+        "match_every_result": true
     }
 }

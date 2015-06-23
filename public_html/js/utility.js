@@ -12,6 +12,10 @@ function isEmpty(obj) {
     
     if(typeof obj === 'undefined')
         return true;
+    
+    if(typeof obj === 'boolean'){
+        return false;
+    }
 
     // Assume if it has a length property with a non-zero value
     // that that property is correct.

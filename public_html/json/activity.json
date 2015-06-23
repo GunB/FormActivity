@@ -25,7 +25,7 @@
     "Type_of_music": {
         "container": {
             "type": "div",
-            "class": "button custom-select ff-hack"
+            "class": "button custom-select"
         },
         "type": "select",
         "data": {

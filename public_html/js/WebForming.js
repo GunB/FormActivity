@@ -63,17 +63,18 @@ debugging = false;
             style: {
                 //background: "transparent"
             },
-            submit_callback: function (Object) {
+            submit_event: function (Object) {
                 var jObject = $(Object);
 
                 jObject.on("submit, click", "button, input[type='submit']", function (evt) {
                     evt.preventDefault();
-                    var that = $(this).parents("."+config.default_webformed.class);
+                    var that = $(this).parents("." + config.default_webformed.class);
                     var correct = that.prop("wf-cdata");
-                    
                     var results = that.serializeArray();
-                    console.log(results);
-                    alert(results);
+                    debugging ? console.log(results) : false;
+
+                    var objResps = check_progress(results, correct);
+                    debugging ? console.log(objResps) : false;
                 });
             },
             submit_correct: function (options) {
@@ -89,7 +90,65 @@ debugging = false;
         var config = settings.config;
         debugging ? console.log("Data ", settings) : false;
 
-        var submit_callback = settings.submit_callback;
+        var submit_event = settings.submit_event;
+
+        var check_progress = function (values, answers) {
+            var objAnswers = {};
+
+            for (var k in answers) {
+                objAnswers[k] = {};
+
+                var check_every_answer = answers[k].match_every_result ? true : false;
+
+                var getted_answers = [];
+                var getted_answers_values = [];
+
+                for (var k2 in values) {
+                    if (values[k2].name === k) {
+                        getted_answers.push(values[k2]);
+                        getted_answers_values.push(values[k2].value);
+                    }
+                }
+
+                var accept;
+
+                if (check_every_answer) {
+
+                    var re = isEmpty(getted_answers_values.join("|")) ?
+                            new RegExp("(?=a)b") : new RegExp(getted_answers_values.join("|"));
+                    
+                    debugging ? console.log(re) : false;
+
+                    for (var k2 in answers[k].expression_results) {
+                        accept = (answers[k].expression_results[k2].match(re) !== null);
+                        var objAnswer = {
+                            value: answers[k].expression_results[k2],
+                            name: k,
+                            accepted: accept
+                        };
+
+                        objAnswers[k][k2] = objAnswer;
+                        objAnswers[k].accepted = isEmpty(objAnswers[k].accepted) ?
+                                accept : objAnswers[k].accepted ? accept : objAnswers[k].accepted;
+                    }
+                } else {
+                    var re = new RegExp(answers[k].expression_results.join("|"));
+                    debugging ? console.log(re) : false;
+
+                    for (var k2 in getted_answers) {
+                        accept = (getted_answers[k2].value.match(re) !== null);
+                        getted_answers[k2].accepted = accept;
+                        getted_answers[k2].correct_value = re.toString();
+
+                        objAnswers[k][k2] = getted_answers[k2];
+                        objAnswers[k].accepted = isEmpty(objAnswers[k].accepted) ?
+                                accept : objAnswers[k].accepted ? accept : objAnswers[k].accepted;
+                    }
+                }
+            }
+
+            return objAnswers;
+        };
 
         //<editor-fold defaultstate="collapsed" desc="Create element">
         var create_element = function (name, val, settings) {
@@ -214,7 +273,7 @@ debugging = false;
             var that = $(this);
             that.prop("wf-cdata", correct);
             that.addClass(config.default_webformed.class);
-            settings.submit_callback(this);
+            submit_event(this);
             // Do something to each element here.
             var target = form_data;
             for (var k in target) {
