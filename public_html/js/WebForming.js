@@ -3,6 +3,8 @@ debugging = false;
 
     $.fn.WebForming = function (form_data, correct, options) {
 
+
+
         // This is the easiest way to have default options.
         var settings = $.extend({}, {
             config: {
@@ -75,6 +77,13 @@ debugging = false;
 
                     var objResps = check_progress(results, correct);
                     debugging ? console.log(objResps) : false;
+
+                    that.trigger({
+                        type: "onResult",
+                        accepted: objResps.accepted,
+                        answers: objResps.answers
+                    });
+
                 });
             },
             submit_correct: function (options) {
@@ -94,6 +103,7 @@ debugging = false;
 
         var check_progress = function (values, answers) {
             var objAnswers = {};
+            var boolResp = true;
 
             for (var k in answers) {
                 objAnswers[k] = {};
@@ -116,7 +126,7 @@ debugging = false;
 
                     var re = isEmpty(getted_answers_values.join("|")) ?
                             new RegExp("(?=a)b") : new RegExp(getted_answers_values.join("|"));
-                    
+
                     debugging ? console.log(re) : false;
 
                     for (var k2 in answers[k].expression_results) {
@@ -130,6 +140,8 @@ debugging = false;
                         objAnswers[k][k2] = objAnswer;
                         objAnswers[k].accepted = isEmpty(objAnswers[k].accepted) ?
                                 accept : objAnswers[k].accepted ? accept : objAnswers[k].accepted;
+
+                        boolResp = boolResp ? accept : boolResp;
                     }
                 } else {
                     var re = new RegExp(answers[k].expression_results.join("|"));
@@ -143,9 +155,13 @@ debugging = false;
                         objAnswers[k][k2] = getted_answers[k2];
                         objAnswers[k].accepted = isEmpty(objAnswers[k].accepted) ?
                                 accept : objAnswers[k].accepted ? accept : objAnswers[k].accepted;
+
+                        boolResp = boolResp ? accept : boolResp;
                     }
                 }
             }
+
+            objAnswers = {answers: objAnswers, accepted: boolResp};
 
             return objAnswers;
         };
@@ -334,6 +350,14 @@ debugging = false;
             that.removeAttr("wf-form");
             that.removeAttr("wf-data");
             that.removeAttr("wf-noextra");
+        }).on("onResult", function (evt) {
+            debugging ? console.log(evt) : false;
+
+            if (evt.accepted) {
+                //Respuesta correcta
+            } else {
+                //Error en la respuesta
+            }
         });
     });
 
