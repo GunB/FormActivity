@@ -2,9 +2,9 @@ debugging = false;
 (function ($) {
 
     $.fn.WebForming = function (form_data, correct, options) {
-
-
-
+        if (!isEmpty(this.prop("wf-cdata"))) {
+            return;
+        }
         // This is the easiest way to have default options.
         var settings = $.extend({}, {
             config: {
@@ -23,7 +23,8 @@ debugging = false;
                         "add_type": true,
                         "add_name": true,
                         "special_tag": "input",
-                        "requirable": true
+                        "requirable": true,
+                        "type_of_change": "type"
                     }, "submit": {
                         "add_type": true,
                         "add_name": true,
@@ -33,32 +34,38 @@ debugging = false;
                         "add_type": true,
                         "add_name": true,
                         "special_tag": "input",
-                        "requirable": true
+                        "requirable": true,
+                        "type_of_change": "type"
                     }, "range": {
                         "add_type": true,
                         "add_name": true,
                         "special_tag": "input",
-                        "requirable": true
+                        "requirable": true,
+                        "type_of_change": ""
                     }, "radio": {
                         "add_type": true,
                         "add_name": true,
                         "special_tag": "input",
-                        "requirable": true
+                        "requirable": true,
+                        "type_of_change": "check"
                     }, "password": {
                         "add_type": true,
                         "add_name": true,
                         "special_tag": "input",
-                        "requirable": true
+                        "requirable": true,
+                        "type_of_change": "type"
                     }, "checkbox": {
                         "add_type": true,
                         "add_name": true,
                         "special_tag": "input",
                         //"type_send": "array",
-                        "requirable": true
+                        "requirable": true,
+                        "type_of_change": "check"
                     }, "select": {
                         "add_type": false,
                         "add_name": true,
-                        "requirable": true
+                        "requirable": true,
+                        "type_of_change": "choose"
                     }
                 }
             },
@@ -200,20 +207,118 @@ debugging = false;
             val.text ? element.text(val.text) : false;
             val.html ? element.html(val.html) : false;
 
+            /**********************      Checking special data to be setted     ********************/
             if (boolIsTypeSpecial) {
                 if (objType.requirable) {
                     val.required ? element.prop("required", true) : settings.required ? element.prop("required", true) : false;
                     val.required ? element.attr("required", true) : settings.required ? element.attr("required", true) : false;
                 }
-            }
-
-            if (boolIsTypeSpecial) {
                 if (objType.add_type) {
                     element.attr("type", val.type);
                 }
                 if (objType.add_name) {
                     objType.type_send === "array" ? name = name + "[]" : false;
                     element.attr("name", name);
+                }
+                
+                var check_data = function (data){
+                    for (var k in data) {
+                        if(!data[k]){
+                            return false;
+                        }
+                    }
+                };
+
+                /*********************      Adding events to every element      ********************/
+                if (objType.add_name && element.prop("required") && objType.type_of_change) {
+                    debugging ? console.warn(name) : false;
+                    switch (objType.type_of_change) {
+                        case "check":
+                            var objProp = settings.default_bind.prop("wf-cquestions");
+                            objProp[name] = false;
+                            settings.default_bind.prop("wf-cquestions", objProp);
+
+                            element.change(function () {
+                                var that = $(this);
+                                var objProp = settings.default_bind.prop("wf-cquestions");
+
+                                if (that.is(':checked')) {
+                                    objProp[that.attr("name")] = true;
+                                } else {
+                                    objProp[that.attr("name")] = false;
+                                }
+
+                                debugging ? console.log("change check", name, that.is(':checked')) : false;
+
+                                settings.default_bind.prop("wf-cquestions", objProp);
+                                settings.default_bind.trigger({
+                                    type: "onChange",
+                                    state: settings.default_bind.prop("wf-cquestions"),
+                                    accepted : check_data(settings.default_bind.prop("wf-cquestions"))
+                                });
+                            });
+                            element.change();
+                            break;
+                        case "type":
+                            var objProp = settings.default_bind.prop("wf-cquestions");
+                            objProp[name] = false;
+                            settings.default_bind.prop("wf-cquestions", objProp);
+
+                            element.change(function () {
+                                var that = $(this);
+                                var objProp = settings.default_bind.prop("wf-cquestions");
+
+                                if (that.val().trim() !== "") {
+                                    objProp[that.attr("name")] = true;
+                                } else {
+                                    objProp[that.attr("name")] = false;
+                                }
+
+                                debugging ? console.log("type check", name) : false;
+
+                                settings.default_bind.prop("wf-cquestions", objProp);
+                                settings.default_bind.trigger({
+                                    type: "onChange",
+                                    state: settings.default_bind.prop("wf-cquestions"),
+                                    accepted : check_data(settings.default_bind.prop("wf-cquestions"))
+                                });
+                            });
+                            element.change();
+                            break;
+                        case "choose":
+                            var objProp = settings.default_bind.prop("wf-cquestions");
+                            objProp[name] = false;
+                            settings.default_bind.prop("wf-cquestions", objProp);
+
+                            element.change(function () {
+                                var that = $(this);
+                                var objProp = settings.default_bind.prop("wf-cquestions");
+
+                                var optionSelected = $("option:selected", that);
+                                var valueSelected = this.value;
+
+                                if (valueSelected.trim() !== "" && optionSelected !== "") {
+                                    objProp[that.attr("name")] = true;
+                                } else {
+                                    objProp[that.attr("name")] = false;
+                                }
+
+                                debugging ? console.log("choose check", name) : false;
+
+                                settings.default_bind.prop("wf-cquestions", objProp);
+                                settings.default_bind.trigger({
+                                    type: "onChange",
+                                    state: settings.default_bind.prop("wf-cquestions"),
+                                    accepted : check_data(settings.default_bind.prop("wf-cquestions"))
+                                });
+                            });
+                            element.change();
+                            break;
+                        default:
+                            break;
+                    }
+
+
                 }
             }
 
@@ -288,7 +393,18 @@ debugging = false;
         return this.each(function () {
             var that = $(this);
             that.prop("wf-cdata", correct);
+            that.prop("wf-cquestions", {});
+
             that.addClass(config.default_webformed.class);
+
+            if (!isEmpty(config.default_webformed.container)) {
+                var element = create_element(null, config.default_webformed.container, config);
+                that.append(element);
+                that = element;
+            }
+
+            config.default_bind = that;
+
             submit_event(this);
             // Do something to each element here.
             var target = form_data;
@@ -358,6 +474,8 @@ debugging = false;
             } else {
                 //Error en la respuesta
             }
+        }).on("onChange", function (evt) {
+            debugging ? console.log(evt) : false;
         });
     });
 
